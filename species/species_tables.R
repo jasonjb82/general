@@ -11,7 +11,9 @@ setwd("D:/R/species/")
 # extract data using pdftools ---------------------------------------------
 
 # Page 01
-data <- pdf_text(pdf_file) %>%
+pdf_file = "table3_00.pdf"
+
+df <- pdf_text(pdf_file) %>%
     strsplit("\n") %>%
     as_tibble(.name_repair = make.names) %>%
     slice(16:100) %>%
@@ -19,9 +21,9 @@ data <- pdf_text(pdf_file) %>%
     #CDI = str_sub(X,0,2), 
     #Code = str_sub(X,3,9),
     #Text = str_sub(X,10,100)) %>%
-      CDI = str_sub(X,0,8), 
-      Code = str_sub(X,13,20),
-      Text = str_sub(X,21,100)) %>%
+      CDI = str_sub(X,0,9), 
+      code = str_sub(X,10,25),
+      text = str_sub(X,26,100)) %>%
     # remove original string
     select(-X) %>%
     slice(2:100) %>%
@@ -30,7 +32,9 @@ data <- pdf_text(pdf_file) %>%
     #filter(!(CDI=="CD")) %>%
     as.data.frame() %>%
     mutate_if(is.character, list(~na_if(.,""))) %>%
-    fill(CDI,Code)
+    fill(CDI,code) %>%
+    mutate(page = pdf_file) %>%
+    mutate(CDI = ifelse(is.na(CDI),0,CDI))
 
 # rest of the pages
 
@@ -71,11 +75,12 @@ data <- pdf_text(pdf_file) %>%
   fill(CDI,code) 
 
   combined_df <- rbind(combined_df,data)
-
 }
 
+merge_df <- rbind(combined_df,df)
+
 # Clean up table
-comb_df <- combined_df %>%
+comb_df <- merge_df %>%
   group_by(CDI,code) %>% 
   select(-page) %>%
   summarise_all(funs(paste(., collapse = " ; "))) %>%
@@ -89,8 +94,8 @@ comb_df <- combined_df %>%
   mutate(genus = ifelse(grepl('SP$',code),paste0(genus," ",species),genus),
          species = ifelse(grepl('SP$',code),NA,species)) %>%
   mutate(species = ifelse(grepl('^L.',authority),paste0(species," ",authority),species),
-         authority = ifelse(grepl('^L.',authority),NA,authority)) %>%
-  separate(common_name,into = c("authority2","common_name_add"), sep = "(?<=\\))",convert = TRUE, remove=FALSE,fill="right") %>%
-  mutate(authority = ifelse(!is.na(common_name_add),paste0(authority," ",authority2),authority))
+         authority = ifelse(grepl('^L.',authority),NA,authority))
+  #separate(common_name,into = c("authority2","common_name_add"), sep = "(?<=\\))",convert = TRUE, remove=FALSE,fill="right") %>%
+  #mutate(authority = ifelse(!is.na(common_name_add),paste0(authority," ",authority2),authority))
 
          
