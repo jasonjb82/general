@@ -93,8 +93,10 @@ comb_df <- merge_df %>%
          species = ifelse(grepl('SP$',code),NA,species)) %>%
   mutate(species = ifelse(grepl('^L.',authority),paste0(species," ",authority),species),
          authority = ifelse(grepl('^L.',authority),NA,authority)) %>%
-  mutate(authority = str_replace(authority,"[']",''))
-#separate(common_name,into = c("authority2","common_name_add"), sep = "(?<=\\))",convert = TRUE, remove=FALSE,fill="right") %>%
+  mutate(authority = str_replace(authority,"[']",'')) %>%
+  mutate(genus = ifelse(code == "MIXI",paste0(genus," ",species),genus)) %>%
+  mutate(species = ifelse(code == "MIXI",NA,species))
+  #separate(common_name,into = c("authority2","common_name_add"), sep = "(?<=\\))",convert = TRUE, remove=FALSE,fill="right") %>%
   #mutate(authority = ifelse(!is.na(common_name_add),paste0(authority," ",authority2),authority))
 
          
