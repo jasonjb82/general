@@ -3,8 +3,13 @@ library(pdftools)
 library(naniar)
 library(tidyverse)
 library(rstudioapi)    
-cwd <- rstudioapi::getActiveDocumentContext()$path
 require(dplyr)
+
+# setting up --------------------------------------------------------------
+current_path <- rstudioapi::getActiveDocumentContext()$path 
+setwd(dirname(current_path ))
+print(getwd())
+
 
 # function to read subset of pages
 read_single_page <- function(pdf, page){
@@ -130,6 +135,6 @@ comb_df <- merge_df %>%
   arrange(code)
 
 # export to csv
-write.csv(comb_df,"D:/species_table.csv",row.names = FALSE)
+write.csv(comb_df,"species_table.csv",row.names = FALSE)
       
       
