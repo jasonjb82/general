@@ -31,8 +31,33 @@ df <- pdf_text(pdf_file) %>%
     mutate_if(is.character, list(~na_if(.,""))) %>%
     fill(CDI,code) %>%
     mutate(page = pdf_file) %>%
-    replace(is.na(.), "")
+    replace(is.na(.), "") %>%
     mutate(CDI = ifelse(is.na(CDI),0,CDI))
+
+# Page 27
+pdf_file = "table3 - 0021.pdf"
+
+df1 <- pdf_text(pdf_file) %>%
+  strsplit("\n") %>%
+  as_tibble(.name_repair = make.names) %>%
+  slice(3:11) %>%
+  mutate(
+    CDI = str_sub(X,0,9), 
+    code = str_sub(X,10,25),
+    text = str_sub(X,26,100)) %>%
+  # remove original string
+  select(-X) %>%
+  slice(2:100) %>%
+  # remove white spaces around values
+  mutate_all(str_trim) %>%
+  #filter(!(CDI=="CD")) %>%
+  as.data.frame() %>%
+  mutate_if(is.character, list(~na_if(.,""))) %>%
+  fill(CDI,code) %>%
+  mutate(page = pdf_file) %>%
+  replace(is.na(.), "") %>%
+  mutate(CDI = ifelse(is.na(CDI),0,CDI))
+
 
 # rest of the pages
 
@@ -73,7 +98,7 @@ data <- pdf_text(pdf_file) %>%
   combined_df <- rbind(combined_df,data)
 }
 
-merge_df <- rbind(combined_df,df)
+merge_df <- rbind(combined_df,df,df1)
 
 # clean up table ----------------------------------------------------------
 comb_df <- merge_df %>%
