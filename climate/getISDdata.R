@@ -65,6 +65,19 @@ for (usaf_id in usaf_ids[1:8]) {
 isd_comb_df <- isd_df %>%
   left_join(stations_state_my,by="id") %>%
   left_join(state_code,by=c("state"="name")) %>%
-  select(-category)
+  select(-category) %>%
+  filter(time < ymd_hms("2020-01-01 00:00:00")) # filter data up to 2019
 
+# split dataframe by city
+split_df <- split(isd_comb_df, list(isd_comb_df$state,"_",isd_comb_df$id))
+
+# remove empty lists
+split_df <- Filter(function(x) dim(x)[1] > 0, split_df)
+# remove periods in list names
+names(split_df) <- gsub("\\.", "", names(split_df))
+
+# write out separate CSV for each station
+for (state in names(split_df)) {
+  write.csv(split_df[[state]], paste0(state, ".csv"),row.names = FALSE)
+}
             
