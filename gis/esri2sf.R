@@ -6,7 +6,7 @@ library(rgdal)
 setwd("C:/Users/Jason/Desktop/")
 
 # set url
-url <- "https://services3.arcgis.com/mKcWKyEU5Tl36xeT/ArcGIS/rest/services/RSPO_Concession_270320/FeatureServer/0"
+url <- "https://gis.wwf.id/server/rest/services/National/Kawasan_Hutan_Indonesia_KLHK_2014/MapServer/0"
 
 # convert to df
 df <- esri2sf(url)
@@ -15,4 +15,4 @@ df <- esri2sf(url)
 spdf = as(df, 'Spatial')
 
 # write out a new shapefile (including .prj component)
-st_write(df, "RSPO_Concession_270320.shp")
+st_write(df, "national.natdbo.Kawasan_Hutan_Indonesia_KLHK_2014.shp")
