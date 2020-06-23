@@ -14,7 +14,7 @@
 ##          > More information on NOAA's Integrated Surface Database format can be found
 ##            at the following link - https://www1.ncdc.noaa.gov/pub/data/ish/ish-format-document.pdf
 ##
-##          > Variables in each file is as shown at the following link - 
+##          > Weather variables in each file is as shown at the following link - 
 ##            https://rich-iannone.github.io/stationaRy/reference/get_met_data.html
 ##
 ## ------------------------------------------------------------------------
