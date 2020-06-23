@@ -24,7 +24,7 @@ options(scipen = 6, digits = 4) # I prefer to view outputs in non-scientific not
 ## load packages ----------------------------------------------------------
 library(tidyverse)
 library(stationaRy) # library to download ISD data -https://github.com/rich-iannone/stationaRy
-library(nominatim) # library for geocoding 
+library(nominatim) # library for geocoding stations using Mapquest
 
 # setting up --------------------------------------------------------------
 current_path <- rstudioapi::getActiveDocumentContext()$path 
