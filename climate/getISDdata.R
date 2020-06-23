@@ -1,6 +1,30 @@
-# load required libraries -------------------------------------------------
-library(stationaRy)
-library(nominatim)
+## ------------------------------------------------------------------------
+##
+## Purpose of script: Read weather data for Malaysia from ISD (Integrated Surface Database)
+##                    and write to individual csv files for each state
+##
+## Author: Jason Benedict
+##
+## Date Created: 2020-06-14
+## 
+## ------------------------------------------------------------------------
+##
+## Notes:   > Integrated Surface Dataset website - https://www.ncdc.noaa.gov/isd
+##
+##          > More information on NOAA's Integrated Surface Database format can be found
+##            at the following link - https://www1.ncdc.noaa.gov/pub/data/ish/ish-format-document.pdf
+##
+##          > Variables in each file is as shown at the following link - 
+##            https://rich-iannone.github.io/stationaRy/reference/get_met_data.html
+##
+## ------------------------------------------------------------------------
+
+options(scipen = 6, digits = 4) # I prefer to view outputs in non-scientific notation
+
+## load packages ----------------------------------------------------------
+library(tidyverse)
+library(stationaRy) # library to download ISD data -https://github.com/rich-iannone/stationaRy
+library(nominatim) # library for geocoding 
 
 # setting up --------------------------------------------------------------
 current_path <- rstudioapi::getActiveDocumentContext()$path 
@@ -17,7 +41,7 @@ stations_my <-
   get_station_metadata() %>%
   dplyr::filter(country == "MY") %>%
   filter(str_detect(tz_name, "^Asia/")) %>%
-  select(id,usaf,name,lat,lon,begin_year,end_year)
+  select(id,usaf,icao,name,lat,lon,begin_year,end_year,begin_date,end_date)
 
 # geocode stations to get states
 latlong <- stations_my %>% 
@@ -25,7 +49,7 @@ latlong <- stations_my %>%
   unique() %>% 
   mutate(index=row_number())
 
-key = "<YOUR MAPQUEST API KEY HERE>" # register at https://developer.mapquest.com/ to get your API key
+key = "<YOUR MAPQUEST GEOCODERKEY HERE>" # register at https://developer.mapquest.com/ to get your API key
 
 coords <- reverse_geocode_coords(latlong$lat,latlong$lon,key=key)
 
@@ -49,7 +73,7 @@ usaf_ids <- stations_state_my %>%
 isd_df = data.frame()
 
 # loop and download data
-for (usaf_id in usaf_ids[1:8]) {
+for (usaf_id in usaf_ids) {
 
   station_data <- 
   get_station_metadata() %>%
@@ -68,7 +92,7 @@ isd_comb_df <- isd_df %>%
   select(-category) %>%
   filter(time < ymd_hms("2020-01-01 00:00:00")) # filter data up to 2019
 
-# split dataframe by city
+# split dataframe by state
 split_df <- split(isd_comb_df, list(isd_comb_df$state,"_",isd_comb_df$id))
 
 # remove empty lists
@@ -76,8 +100,18 @@ split_df <- Filter(function(x) dim(x)[1] > 0, split_df)
 # remove periods in list names
 names(split_df) <- gsub("\\.", "", names(split_df))
 
+
+## export data --------------------------------------------------------
+
 # write out separate CSV for each station
 for (state in names(split_df)) {
   write.csv(split_df[[state]], paste0(state, ".csv"),row.names = FALSE)
 }
+
+# write station info to csv
+stations_my_info <- stations_state_my %>%
+  left_join(select(stations_my,usaf,icao,begin_year,end_year),by="usaf") %>%
+  relocate(icao,.before=usaf)
+
+write_csv(stations_my_info,"ISD_MY_STATIONS_INFO.csv")
             
