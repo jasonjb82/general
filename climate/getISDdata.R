@@ -1,7 +1,7 @@
 ## ------------------------------------------------------------------------
 ##
 ## Purpose of script: Read weather data for Malaysia from ISD (Integrated Surface Database)
-##                    and write to individual csv files for each state
+##                    and write to individual csv files for every station in each state
 ##
 ## Author: Jason Benedict
 ##
