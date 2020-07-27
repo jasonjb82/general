@@ -9,7 +9,7 @@ from pyGEDI import *
 import numpy as np
 
 username='jasonjb82'
-password='Rigel1853'
+password='****'
 
 session=sessionNASA(username,password)
 
