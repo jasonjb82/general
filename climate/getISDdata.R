@@ -25,6 +25,7 @@ options(scipen = 6, digits = 4) # I prefer to view outputs in non-scientific not
 library(tidyverse)
 library(stationaRy) # library to download ISD data -https://github.com/rich-iannone/stationaRy
 library(nominatim) # library for geocoding stations using Mapquest
+library(lubridate) # for time and date conversion
 
 # setting up --------------------------------------------------------------
 current_path <- rstudioapi::getActiveDocumentContext()$path 
@@ -49,7 +50,7 @@ latlong <- stations_my %>%
   unique() %>% 
   mutate(index=row_number())
 
-key = "<YOUR MAPQUEST GEOCODERKEY HERE>" # register at https://developer.mapquest.com/ to get your API key
+key = "<MAPQUEST KEY>" # register at https://developer.mapquest.com/ to get your API key
 
 coords <- reverse_geocode_coords(latlong$lat,latlong$lon,key=key)
 
@@ -79,7 +80,7 @@ for (usaf_id in usaf_ids) {
   get_station_metadata() %>%
   filter(usaf == usaf_id) %>%
   dplyr::pull(id) %>%
-  get_met_data(years = filter(stations_my,usaf == usaf_id)[[6]]:filter(stations_my,usaf == usaf_id)[[7]])
+  get_met_data(years = filter(stations_my,usaf == usaf_id)[[7]]:filter(stations_my,usaf == usaf_id)[[8]])
   
   isd_df <- rbind(isd_df,station_data)
 
@@ -90,7 +91,7 @@ isd_comb_df <- isd_df %>%
   left_join(stations_state_my,by="id") %>%
   left_join(state_code,by=c("state"="name")) %>%
   select(-category) %>%
-  filter(time < ymd_hms("2020-01-01 00:00:00")) # filter data up to 2019
+  filter(time < ymd_hms("2021-01-01 00:00:00")) # filter data up to 2019
 
 # split dataframe by state
 split_df <- split(isd_comb_df, list(isd_comb_df$state,"_",isd_comb_df$id))
