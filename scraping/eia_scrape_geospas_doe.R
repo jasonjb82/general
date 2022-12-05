@@ -40,5 +40,8 @@ df_clean <- df %>%
   as_tibble() %>%
   glimpse()
 
+# get scrape date
+date = format(Sys.time(), "%Y%m%d")
+
 # write to csv
-write_csv(df_clean,"eia_geospas_doe.csv")
+write_csv(df_clean,paste0("eia_geospas_doe_",date,".csv"))
